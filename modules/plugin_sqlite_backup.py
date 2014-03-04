@@ -34,18 +34,21 @@ def copy_db(mydir=None):
     """
     try:
         request = current.request
+        print 'request.folder is', request.folder
+        sourcefile = os.path.join(request.folder, 'databases/storage.sqlite')
+        print 'sourcefile is', sourcefile
+        target_dir = os.path.join(request.folder, 'backup')
+        print 'target_dir is', target_dir
+        mytime = time.strftime(".%Y-%m-%d-%H%M")
+        backfilename = os.path.basename(sourcefile) + mytime
+        backupfile = os.path.join(target_dir, backfilename)
+        print 'backupfile is', backupfile
 
-        app_path = os.getcwd() + '/applications/' + request.application
-        source = os.path.join(app_path, '/databases/storage.sqlite')
-        target_dir = os.path.join(app_path, '/backup')
-        mytime = time.strftime(".%Y%m%d-%H%M")
-        backupfile = os.path.join(target_dir, os.path.basename(source) + mytime)
-
-        db = sqlite3.connect(source)
+        db = sqlite3.connect(sourcefile)
         cur = db.cursor()
         cur.execute('begin immediate')
 
-        shutil.copyfile(source, backupfile)
+        shutil.copyfile(sourcefile, backupfile)
         db.rollback()
         return backupfile
     except Exception:
@@ -68,12 +71,14 @@ def do_zip_except_sqlite(target_dir, file_name):
         #print rootlen
         for base, dirs, files in os.walk(target_dir):
             #print dir
+            filelist = []
             for file in files:
                 if file.find('.sqlite', len(file) - 7) == -1:
                     fn = os.path.join(base, file)
                     zip.write(fn, fn[rootlen:])
+                    filelist.append(fn)
         zip.close()
-        return fn
+        return filelist
     except Exception:
         print traceback.format_exc(5)
         return False
@@ -90,9 +95,8 @@ def copy_to_backup():
     """
     try:
         request = current.request
-        base = 'applications/' + request.application
-        backupfile = os.path.join(base, 'backup/databases.zip' + time.strftime(".%Y%m%d-%H%M"))
-        myfile1 = do_zip_except_sqlite(os.path.join(base, 'databases'), backupfile)
+        backupfile = os.path.join(request.folder, 'backup/databases.zip' + time.strftime(".%Y%m%d-%H%M"))
+        myfile1 = do_zip_except_sqlite(os.path.join(request.folder, 'databases'), backupfile)
         myfile2 = copy_db()
         return [myfile2, myfile1]
     except Exception:
