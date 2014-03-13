@@ -1,3 +1,7 @@
+*.un~
+*.sw[op]
+*.bak
+
 *.py[cod]
 
 # C extensions
