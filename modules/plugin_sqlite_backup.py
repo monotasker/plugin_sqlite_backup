@@ -34,15 +34,15 @@ def copy_db(mydir=None):
     """
     try:
         request = current.request
-        print 'request.folder is', request.folder
+        print('request.folder is', request.folder)
         sourcefile = os.path.join(request.folder, 'databases/storage.sqlite')
-        print 'sourcefile is', sourcefile
+        print('sourcefile is', sourcefile)
         target_dir = os.path.join(request.folder, 'backup')
-        print 'target_dir is', target_dir
+        print('target_dir is', target_dir)
         mytime = time.strftime(".%Y-%m-%d-%H%M")
         backfilename = os.path.basename(sourcefile) + mytime
         backupfile = os.path.join(target_dir, backfilename)
-        print 'backupfile is', backupfile
+        print('backupfile is', backupfile)
 
         db = sqlite3.connect(sourcefile)
         cur = db.cursor()
@@ -52,7 +52,7 @@ def copy_db(mydir=None):
         db.rollback()
         return backupfile
     except Exception:
-        print traceback.format_exc(5)
+        print(traceback.format_exc(5))
         return False
 
 
@@ -80,7 +80,7 @@ def do_zip_except_sqlite(target_dir, file_name):
         zip.close()
         return filelist
     except Exception:
-        print traceback.format_exc(5)
+        print(traceback.format_exc(5))
         return False
 
 
@@ -100,7 +100,7 @@ def copy_to_backup():
         myfile2 = copy_db()
         return [myfile2, myfile1]
     except Exception:
-        print traceback.format_exc(5)
+        print(traceback.format_exc(5))
         return False
 
 
